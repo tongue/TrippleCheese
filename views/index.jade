@@ -1,0 +1,13 @@
+div#slider.line
+div#connect.modal
+    fieldset#options.options
+        h1 #{title}
+        p
+            label(for="nickname") Name:
+            input#nickname(type="text", name="nickname", value="UnnamedPlayer")
+        p
+            label(for="ip") IP:
+            input#ip(type="text", name="ip", value="#{host}")
+
+    a#connectButton.connect(href="#connect")
+        span Join

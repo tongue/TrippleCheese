@@ -1,0 +1,32 @@
+script
+    var socket = io.connect('http://localhost:3000');
+    socket.emit('setgamescreen', 'me');
+    var ids = '';
+    var exists = false;
+    socket.on('newplayer', function(player){
+        var obj = {
+            'id': player,
+            'color': 'FF0000'
+        }
+        socket.emit('color', obj);
+    })
+
+    socket.on('position', function(position) {
+        if (ids.indexOf(position.id) == -1) {
+            console.log('new player');
+
+            ids += position.id + ', ';
+
+            var text = document.createElement('input');
+            text.type = 'text';
+            text.name = position.id;
+            text.id = position.id;
+            text.value = '';
+
+            document.getElementById('players').appendChild(text);
+            document.getElementById('players').appendChild(document.createElement('br'));
+        }
+        document.getElementById(position.id).value = position.xpos + '%';
+    });
+
+#players
