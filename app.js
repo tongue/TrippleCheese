@@ -38,12 +38,24 @@ app.listen(3000, function () {
 /**
  * Socket.io
  */
-
-var io = require('socket.io').listen(app, {transports: ['flashsocket', 'websocket', 'htmlfile', 'xhr-polling', 'jsonp-polling']});
+// , { transports: ['flashsocket', 'websocket', 'htmlfile', 'xhr-polling', 'jsonp-polling'] }
+var io = require('socket.io').listen(app);
 
 var clients = [],
 	gameScreenIsSet = false,
 	gameScreen;
+
+io.enable('browser client minification');  // send minified client
+io.enable('browser client etag');          // apply etag caching logic based on version number
+io.enable('browser client gzip');          // gzip the file
+io.set('log level', 1);                    // reduce logging
+io.set('transports', [                     // enable all transports (optional if you want flashsocket)
+	'websocket'
+	, 'flashsocket'
+	, 'htmlfile'
+	, 'xhr-polling'
+	, 'jsonp-polling'
+]);
 
 io.sockets.on('connection', function (socket) {
 	socket.on('setgamescreen', function (gamescreen) {
@@ -66,10 +78,8 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	socket.on('color', function (player) {
-		console.log(clients.length);
 		for (var i = 0; i < clients.length; i++) {
 			if (clients[i][0] === player.id) {
-				console.log(player.id);
 				clients[i][1].emit('yourcolor', player);
 			}
 		}
@@ -80,8 +90,10 @@ io.sockets.on('connection', function (socket) {
 			var client = [socket.id, socket]
 			clients.push(client);
 			gameScreen.emit('newplayer', socket.id);
+			console.log('### CLIENT CONNECTED');
 		} else {
 			socket.emit('nogamescreen', true);
+			console.log('### NO GAMESCREEN AVAILABLE!');
 			socket.disconnect();
 		}
 	});
